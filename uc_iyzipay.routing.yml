@@ -1,0 +1,15 @@
+uc_iyzipay.complete:
+  path: '/cart/iyzipay/complete'
+  defaults:
+    _controller: '\Drupal\uc_iyzipay\Controller\IyzipayController::complete'
+    _title: 'Order complete'
+  requirements:
+    _permission: 'access content'
+
+uc_iyzipay.notification:
+  path: '/cart/iyzipay/notification'
+  defaults:
+    _controller: '\Drupal\uc_iyzipay\Controller\IyzipayController::notification'
+    _title: 'Notification callback'
+  requirements:
+    _permission: 'access content'

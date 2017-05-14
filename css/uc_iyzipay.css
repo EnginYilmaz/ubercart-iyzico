@@ -1,0 +1,13 @@
+/**
+ * @file
+ * Styles for uc_iyzipay module.
+ */
+
+img.uc-iyzipay-logo {
+  position: relative;
+  left: 2.2em; /* LTR */
+}
+[dir="rtl"] img.uc-iyzipay-logo {
+  left: auto;
+  right: 2.2em;
+}
