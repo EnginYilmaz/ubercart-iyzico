@@ -60,50 +60,19 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['sid'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Vendor account number'),
+      '#title' => $this->t('API Key'),
       '#description' => $this->t('Your iyzipay vendor account number.'),
       '#default_value' => $this->configuration['sid'],
-      '#size' => 16,
     );
     $form['secret_word'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('Secret word for order verification'),
+      '#title' => $this->t('Secret Key'),
       '#description' => $this->t('The secret word entered in your iyzipay account Look and Feel settings.'),
       '#default_value' => $this->configuration['secret_word'],
-      '#size' => 16,
-    );
-    $form['demo'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Enable demo mode, allowing you to process fake orders for testing purposes.'),
-      '#default_value' => $this->configuration['demo'],
-    );
-    $form['language'] = array(
-      '#type' => 'select',
-      '#title' => $this->t('Language preference'),
-      '#description' => $this->t('Adjust language on iyzipay pages.'),
-      '#options' => array(
-        'en' => $this->t('English'),
-        'sp' => $this->t('Spanish'),
-      ),
-      '#default_value' => $this->configuration['language'],
-    );
-    $form['check'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('Allow customers to choose to pay by credit card or online check.'),
-      '#default_value' => $this->configuration['check'],
-    );
-    $form['checkout_type'] = array(
-      '#type' => 'radios',
-      '#title' => $this->t('Checkout type'),
-      '#options' => array(
-        'dynamic' => $this->t('Dynamic checkout (user is redirected to Iyzico)'),
-        'direct' => $this->t('Direct checkout (payment page opens in iframe popup)'),
-      ),
-      '#default_value' => $this->configuration['checkout_type'],
     );
     $form['notification_url'] = array(
       '#type' => 'url',
-      '#title' => $this->t('Instant notification settings URL'),
+      '#title' => $this->t('Base URL'),
       '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
       '#default_value' => Url::fromRoute('uc_iyzipay.notification', [], ['absolute' => TRUE])->toString(),
       '#attributes' => array('readonly' => 'readonly'),
@@ -174,6 +143,8 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
    * {@inheritdoc}
    */
   public function buildRedirectForm(array $form, FormStateInterface $form_state, OrderInterface $order = NULL) {
+		$istek=		\Drupal::request()->request->all();
+		print_r($istek);
 
 
     $address = $order->getAddress('billing');
@@ -225,13 +196,13 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
    // CheckBoxes.
    $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
    $request->setLocale(\Iyzipay\Model\Locale::TR);
-   $request->setConversationId("123456789");
+   $request->setConversationId($this->configuration['sid']);
    //$request->setPrice("1");
    //$request->setPaidPrice("1.3");
    $request->setCurrency(\Iyzipay\Model\Currency::TL);
    $request->setBasketId("B67832");
    $request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::PRODUCT);
-   $request->setCallbackUrl("http://webstudio.web.tr/cart/iyzipay/complete");
+   $request->setCallbackUrl("http://charity.webstudio.web.tr/cart/iyzipay/complete");
    $request->setEnabledInstallments(array(2, 3, 6, 9));
 
    $buyer = new \Iyzipay\Model\Buyer();
@@ -325,15 +296,16 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
    $basketItems[2] = $thirdBasketItem;
    $request->setBasketItems($basketItems);
 */
-   $checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Config::options());
-   print_r($checkoutFormInitialize->getCheckoutFormContent());
-/*
+   //$checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Config::options());
+   //print_r($checkoutFormInitialize->getCheckoutFormContent());
+
     if ('direct' == $this->configuration['checkout_type']) {
-      $form['#attached']['library'][] = 'uc_iyzipay/iyzipay.direct';
+      //$form['#attached']['library'][] = 'uc_iyzipay/iyzipay.direct';
     }
 
     $host = $this->configuration['demo'] ? 'sandbox' : 'www';
-    $form['#action'] = "https://$host.iyzipay.com/checkout/purchase";
+    $form['#action'] = "http://charity.webstudio.web.tr/cart/iyzipay/odeme";
+
 
     foreach ($data as $name => $value) {
       $form[$name] = array('#type' => 'hidden', '#value' => $value);
@@ -344,7 +316,7 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
       '#type' => 'submit',
       '#value' => $this->t('Submit order'),
     );
-*/
+
     return $form;
   }
 

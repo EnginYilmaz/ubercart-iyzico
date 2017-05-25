@@ -6,6 +6,14 @@ uc_iyzipay.complete:
   requirements:
     _permission: 'access content'
 
+uc_iyzipay.odeme:
+  path: '/cart/iyzipay/odeme'
+  defaults:
+    _controller: '\Drupal\uc_iyzipay\Controller\IyzipayController::odeme'
+    _title: 'Order devam ediyor'
+  requirements:
+    _permission: 'access content'
+
 uc_iyzipay.notification:
   path: '/cart/iyzipay/notification'
   defaults:

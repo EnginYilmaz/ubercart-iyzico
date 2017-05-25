@@ -5,7 +5,7 @@ namespace Iyzipay;
 class Request extends BaseModel
 {
     private $locale;
-    private $conversationId;
+    public $conversationId;
 
     public function getLocale()
     {
