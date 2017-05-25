@@ -4,7 +4,6 @@ Engin YILMAZ
 
 INSTALLATION:
 Put the uc_iyzipay module under /modules/ubercart/payment/ directory
-Put the iyzico libraries under /libraries directory
 
 At the moment the only way to make this code work is in a hackish way.
 
@@ -13,7 +12,8 @@ Set your class with your existing API credidentials in necessary files
 
 TODO:
 1) Automation between configuration screen and API Credidentials
-2) Full Integration of the payment page
-3) Full Integration of the checkout page
+2) Seperating the Iyzipay library from the code 
+3) a- Full Integration of the payment page
+   b- Full Integration of the checkout page
 
 
