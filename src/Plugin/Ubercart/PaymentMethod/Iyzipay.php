@@ -72,10 +72,21 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
     );
     $form['notification_url'] = array(
       '#type' => 'url',
+      '#title' => $this->t('Notification URL'),
+      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
+      '#default_value' => $this->configuration['notification_url'],
+    );
+    $form['complate_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Complate URL'),
+      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
+      '#default_value' => $this->configuration['complate_url'],
+    );
+    $form['baseurl'] = array(
+      '#type' => 'url',
       '#title' => $this->t('Base URL'),
-      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
-      '#default_value' => Url::fromRoute('uc_iyzipay.notification', [], ['absolute' => TRUE])->toString(),
-      '#attributes' => array('readonly' => 'readonly'),
+      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
+      '#default_value' => $this->configuration['baseurl'],
     );
 
     return $form;
@@ -85,13 +96,32 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['check'] = $form_state->getValue('check');
-    $this->configuration['checkout_type'] = $form_state->getValue('checkout_type');
-    $this->configuration['demo'] = $form_state->getValue('demo');
-    $this->configuration['language'] = $form_state->getValue('language');
+    //$this->configuration['check'] = $form_state->getValue('check');
+    //$this->configuration['checkout_type'] = $form_state->getValue('checkout_type');
+    //$this->configuration['demo'] = $form_state->getValue('demo');
+    //$this->configuration['language'] = $form_state->getValue('language');
+    $config = \Drupal::service('config.factory')->getEditable('iyzipay.settings');
+    $config->set('apikey', $this->configuration['sid'])->save();
+		$config->set('secretkey', $this->configuration['secret_word'])->save();
+		$config->set('baseurl', $this->configuration['baseurl'])->save();
+		$config->set('complateurl', $this->configuration['complate_url'])->save();	
+		$config->set('notificationurl', $this->configuration['notification_url'])->save();	
+    //drupal_set_message($this->configuration['notification_url']);
+    
     $this->configuration['notification_url'] = $form_state->getValue('notification_url');
     $this->configuration['secret_word'] = $form_state->getValue('secret_word');
     $this->configuration['sid'] = $form_state->getValue('sid');
+    $this->configuration['baseurl'] = $form_state->getValue('baseurl');
+    $this->configuration['complateurl'] = $form_state->getValue('complate_url');
+    $this->configuration['notificationurl'] = $form_state->getValue('notification_url');
+
+
+		//$_SESSION['Iyzipay']['sid']=$this->configuration['sid'];
+		//$_SESSION['Iyzipay']['secret_word']=$this->configuration['secret_word'];
+    // Set and save new message value.
+
+		//$config->set('baseurl', $form_state->getValue('notification_url'))->save();
+		//drupal_set_message(	"secretkey =".	$config->get('secretkey'));
   }
 
   /**
@@ -190,15 +220,17 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
       $data['li_' . $i . '_price'] = uc_currency_format($product->price->value, FALSE, FALSE, '.');
     }
 */
-    $include_yolu = $_SERVER['DOCUMENT_ROOT'].'/modules/ubercart/payment/uc_iyzipay/iyzipay/samples/config.php';
-    require_once($include_yolu);
-    //kint($include_yolu);
-   // CheckBoxes.
+   //$include_yolu = $_SERVER['DOCUMENT_ROOT'].'/modules/ubercart/payment/uc_iyzipay/iyzipay/samples/config.php';
+	 $include_yolu = $_SERVER['DOCUMENT_ROOT'].'/libraries/iyzipay/IyzipayBootstrap.php';
+	 
+   require_once($include_yolu);
+
+	
+
    $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
    $request->setLocale(\Iyzipay\Model\Locale::TR);
    $request->setConversationId($this->configuration['sid']);
-   //$request->setPrice("1");
-   //$request->setPaidPrice("1.3");
+
    $request->setCurrency(\Iyzipay\Model\Currency::TL);
    $request->setBasketId("B67832");
    $request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::PRODUCT);
@@ -321,7 +353,7 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
   }
 
 }
-
+/*
 class Config
 {
     public static function options()
@@ -333,5 +365,5 @@ class Config
         return $options;
     }
 }
-
+*/
 ?>
