@@ -1,3 +1,5 @@
 apikey: 'api_key'
-secretkey: 'username'
-baseurl: 'baseurl'
+secretkey: 'secret_key'
+baseurl: 'base_url'
+complateurl: 'complate_url'
+notificationurl: 'notification_url'
