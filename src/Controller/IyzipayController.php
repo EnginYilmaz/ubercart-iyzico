@@ -1,7 +1,5 @@
 <?php
-
 namespace Drupal\uc_iyzipay\Controller;
-
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Controller\ControllerBase;
@@ -10,8 +8,6 @@ use Drupal\uc_order\Entity\Order;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-
-
 /**
  * Controller routines for uc_iyzipay.
  */
@@ -22,7 +18,6 @@ class IyzipayController extends ControllerBase {
    * @var \Drupal\uc_cart\CartManager
    */
   protected $cartManager;
-
   /**
    * Constructs a IyzipayController.
    *
@@ -32,7 +27,6 @@ class IyzipayController extends ControllerBase {
   public function __construct(CartManagerInterface $cart_manager) {
     $this->cartManager = $cart_manager;
   }
-
   /**
    * {@inheritdoc}
    */
@@ -42,7 +36,6 @@ class IyzipayController extends ControllerBase {
       $container->get('uc_cart.manager')
     );
   }
-
   /**
    * Finalizes Iyzipay transaction.
    *
@@ -54,12 +47,24 @@ class IyzipayController extends ControllerBase {
   public function complete($cart_id = 0, Request $request1) {
 		$conversation_id = $_SESSION['Iyzipay']['conversation_id'];
 		$token= $_POST["token"];
-		$include_yolu = $_SERVER['DOCUMENT_ROOT'].'/modules/ubercart/payment/uc_iyzipay/iyzipay/samples/config.php';
+		$include_yolu = $_SERVER['DOCUMENT_ROOT'].'/libraries/iyzipay/IyzipayBootstrap.php';
 		require_once($include_yolu);
 		$request = new \Iyzipay\Request\RetrieveCheckoutFormRequest();
 		$request->setLocale(\Iyzipay\Model\Locale::TR);
 		$request->setToken($token);
-		$checkoutForm = \Iyzipay\Model\CheckoutForm::retrieve($request, Config::options());
+		
+		$options = new \Iyzipay\Options();
+   	$config = \Drupal::config('iyzipay.settings');
+	 	$apikey=$config->get('apikey');
+	 	$secretkey= $config->get('secretkey');
+	 	$baseurl= $config->get('baseurl');
+	  
+	  $options = new \Iyzipay\Options();
+    $options->setApiKey($apikey);
+    $options->setSecretKey($secretkey);
+    $options->setBaseUrl($baseurl);
+    
+		$checkoutForm = \Iyzipay\Model\CheckoutForm::retrieve($request, $options);
 		print_r($checkoutForm->getPaymentStatus());
 		print_r($checkoutForm->getErrorMessage());
 		print_r($checkoutForm->getStatus());
@@ -82,14 +87,14 @@ class IyzipayController extends ControllerBase {
    *   The request of the page.
    */
   public function odeme($cart_id = 0, Request $request1) {
-		$include_yolu = $_SERVER['DOCUMENT_ROOT'].'/modules/ubercart/payment/uc_iyzipay/iyzipay/samples/config.php';
+		$include_yolu = $_SERVER['DOCUMENT_ROOT'].'/libraries/iyzipay/IyzipayBootstrap.php';
   	require_once($include_yolu);
 		$order = Order::create(array(
 		  'uid' => 1,
 			'order_status' => uc_order_state_default('post_checkout'),
 		));
+		
 		$order->save();
-
 		uc_order_comment_save($order->id(), $this->currentUser()->id(), $this->t('Iyzico ödeme yöntemi tarafından eklenmiş bir ödeme ancak ödeme henüz yapıldı mı kontrol etmelisiniz.'), 'admin');
 		$product = \Drupal::entityTypeManager()->getStorage('uc_order_product')->create(array(
 		'billing-first-name' => "deneme",
@@ -97,6 +102,7 @@ class IyzipayController extends ControllerBase {
 		'order_id' => $order->id(),
 		//'nid' => 3,
 		));
+		$config = \Drupal::config('iyzipay.settings');
 		$product->save();
 		$_SESSION['Iyzipay']['conversation_id'] = $order->id();
 		uc_order_product_save($order->id(), $product);
@@ -108,7 +114,10 @@ class IyzipayController extends ControllerBase {
 		$request->setCurrency(\Iyzipay\Model\Currency::TL);
 		$request->setBasketId("B67832");
 		$request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::PRODUCT);
-		$request->setCallbackUrl("http://charity.webstudio.web.tr/cart/iyzipay/complete");
+		
+		$complateurl= $config->get('complateurl');
+		$request->setCallbackUrl($complateurl);
+		
 		$request->setEnabledInstallments(array(2, 3, 6, 9));
 		$buyer = new \Iyzipay\Model\Buyer();
 		$buyer->setId("BY789");
@@ -141,7 +150,6 @@ class IyzipayController extends ControllerBase {
 		$request->setBillingAddress($billingAddress);
 	 	$toplam_fiyat=0;
    	$basketItems = array();
-
    	for ($i=0;$i<3;$i++) {
 		 $j= $i+1;
 		 $fiyat= \Drupal::request()->request->get('li_' . $j . '_price');
@@ -162,7 +170,17 @@ class IyzipayController extends ControllerBase {
     $request->setPaidPrice($toplam_fiyat);
     $request->setBasketItems($basketItems);
 	 
-    $checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Config::options());
+	  $options = new \Iyzipay\Options();
+	 	$apikey=$config->get('apikey');
+	 	$secretkey= $config->get('secretkey');
+	 	$baseurl= $config->get('baseurl');
+	 		 
+	  $options = new \Iyzipay\Options();
+    $options->setApiKey($apikey);
+    $options->setSecretKey($secretkey);
+    $options->setBaseUrl($baseurl);
+        
+    $checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, $options);
     print_r($checkoutFormInitialize->getStatus());
 	  print_r($checkoutFormInitialize->getErrorMessage());
 	  print_r($checkoutFormInitialize->getCheckoutFormContent());
@@ -214,16 +232,4 @@ class IyzipayController extends ControllerBase {
     }
     die('ok');
   }
-}
-
-class Config
-{
-    public static function options()
-    {
-        $options = new \Iyzipay\Options();
-        $options->setApiKey("sandbox-mz89SNn9RuJIw8ZZdB8eeIZu3Vq4nW9S");
-        $options->setSecretKey("sandbox-9sYAYshumBYTnwlEqXJTt2ML5m6jKHDj");
-        $options->setBaseUrl("https://sandbox-api.iyzipay.com");
-        return $options;
-    }
 }
