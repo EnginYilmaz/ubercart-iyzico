@@ -22,7 +22,7 @@ Drupal 8 Kurulumunuzun kök dizini / olmak üzere
 1. Iyzico için API bilgileri v.b. girin.
 1. Kullanıma hazır.
 
-![](//images/kurulum-resmi.png)
+![]({{site.baseurl}}/images/kurulum-resmi.png)
 
 -------------
 Credidentals:
