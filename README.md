@@ -2,12 +2,13 @@
 
 Most of the code are derived from Ubercart 2CO Payment module. All my code changes are Licenced under GNU/GPL. 2017 Engin YILMAZ
 
-###
-
-INSTALLATION: 
-1.Put the uc_iyzipay module under /modules/ubercart/payment/ directory
-At the moment the only way to make this code work is in a hackish way.
-
+### INSTALLATION: 
+1.
+2.Put the uc_iyzipay module under /modules/ubercart/payment/ directory
+3.
+4.
+5.
+6.
 USAGE: Set your class with your existing API credidentials in necessary files
 
 TODO:
@@ -29,3 +30,6 @@ Drupal 8 Kurulumunuzun kök dizini / olmak üzere
 3.Drupal Kurulumunuzun /admin/modules sayfasını ziyaret edip;
 4.Ubercart için gerekli modülleri aktif hale getirin.
 5.uc_iyzipay modülünü aktif hale getirin.
+6.Ubercart için iyzico ödeme yöntemi ekleyin
+7.Iyzico için API bilgileri v.b. girin.
+8.Kullanıma hazır.
