@@ -11,3 +11,13 @@ TODO:
 Automation between configuration screen and API Credidentials
 Seperating the Iyzipay library from the code
 a- Full Integration of the payment page b- Full Integration of the checkout page
+
+-------------
+Türkçe
+
+Drupal 8 Kurulumunuzun kök dizini / olmak üzere
+1-) iyzipay kütüphanesini /libraries klasörü altına yapıştırın
+2-) uc_iyzipay modulünü /modules/ubercart/payment klasörünün altına yapıştırın.
+3-) Drupal Kurulumunuzun /admin/modules sayfasını ziyaret edip;
+		a) Ubercart için gerekli modülleri aktif hale getirin.
+    b) uc_iyzipay modülünü aktif hale getirin. 
