@@ -13,14 +13,16 @@ Kodun neredeyse tamamı 2CO ödeme yönteminden alınmış bulunmaktadır. Tüm 
 ### Kurulum:
 
 Drupal 8 Kurulumunuzun kök dizini / olmak üzere
-1.iyzipay kütüphanesini /libraries klasörü altına yapıştırın
-2.uc_iyzipay modulünü /modules/ubercart/payment klasörünün altına yapıştırın.
-3.Drupal Kurulumunuzun /admin/modules sayfasını ziyaret edip;
-4.Ubercart için gerekli modülleri aktif hale getirin.
-5.uc_iyzipay modülünü aktif hale getirin.
-6.Ubercart için iyzico ödeme yöntemi ekleyin
-7.Iyzico için API bilgileri v.b. girin.
-8.Kullanıma hazır.
+1. iyzipay kütüphanesini /libraries klasörü altına yapıştırın
+1. uc_iyzipay modulünü /modules/ubercart/payment klasörünün altına yapıştırın.
+1. Drupal Kurulumunuzun /admin/modules sayfasını ziyaret edip;
+1. Ubercart için gerekli modülleri aktif hale getirin.
+1. uc_iyzipay modülünü aktif hale getirin.
+1. Ubercart için iyzico ödeme yöntemi ekleyin
+1. Iyzico için API bilgileri v.b. girin.
+1. Kullanıma hazır.
+
+
 
 -------------
 Credidentals:
