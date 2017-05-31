@@ -19,7 +19,7 @@ Drupal 8 Kurulumunuzun kök dizini / olmak üzere
 1. Ubercart için gerekli modülleri aktif hale getirin.
 1. uc_iyzipay modülünü aktif hale getirin.
 1. Ubercart için iyzico ödeme yöntemi ekleyin
-1. Iyzico için API bilgileri v.b. girin.
+1. [Iyzico için API bilgileri v.b. girin.](https://github.com/EnginYilmaz/ubercart-iyzico/blob/iyzipay/images/kurulum-resmi.png)
 1. Kullanıma hazır.
 
 
