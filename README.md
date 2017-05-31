@@ -28,4 +28,4 @@ Drupal 8 Kurulumunuzun kök dizini / olmak üzere
 Credidentals:
 Special thanks to author and maintainers of the 2CO payment method. (Their names will be added soon)
 
-2017 Engin YILMAZ (copy left). Premium destek için engin@webstudio.web.tr GSM: 05324029677
+2017 Engin YILMAZ (copy left). Ücretli destek için engin@webstudio.web.tr GSM: 05324029677
