@@ -21,5 +21,9 @@ Drupal 8 Kurulumunuzun kök dizini / olmak üzere
 6.Ubercart için iyzico ödeme yöntemi ekleyin
 7.Iyzico için API bilgileri v.b. girin.
 8.Kullanıma hazır.
+
+-------------
+Credidentals:
+Special thanks to author and maintainers of the 2CO payment method. (Their names will be added soon)
 -------------
 2017 Engin YILMAZ (copy left)
