@@ -61,33 +61,40 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
     $form['sid'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('API Key'),
-      '#description' => $this->t('Your iyzipay vendor account number.'),
+      '#description' => $this->t('Your iyzipay vendor account number given to you by Iyzico.'),
       '#default_value' => $this->configuration['sid'],
     );
     $form['secret_word'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Secret Key'),
-      '#description' => $this->t('The secret word entered in your iyzipay account Look and Feel settings.'),
+      '#description' => $this->t('The secretword given to you by Iyzico'),
       '#default_value' => $this->configuration['secret_word'],
-    );
-    $form['notification_url'] = array(
-      '#type' => 'url',
-      '#title' => $this->t('Notification URL'),
-      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
-      '#default_value' => $this->configuration['notification_url'],
-    );
-    $form['complete_url'] = array(
-      '#type' => 'url',
-      '#title' => $this->t('complete URL'),
-      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
-      '#default_value' => $this->configuration['complete_url'],
     );
     $form['baseurl'] = array(
       '#type' => 'url',
       '#title' => $this->t('Base URL'),
-      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud   reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
+      '#description' => $this->t('Your Base URL given to you by Iyzico'),
       '#default_value' => $this->configuration['baseurl'],
     );
+    $form['notification_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Notification URL'),
+      '#description' => $this->t('Notification URL for example https://yourdomain.com/cart/iyzipay/notification'),
+      '#default_value' => $this->configuration['notification_url'],
+    );
+    $form['complete_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Tamamlandı URL'),
+      '#description' => $this->t('When the transaction Complete the cunsomer will be redirected to this URL. For example https://yourdomain.com/cart/iyzipay/complete'),
+      '#default_value' => $this->configuration['complete_url'],
+    );
+    $form['odeme_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Transaction URL'),
+      '#description' => $this->t('At the time of transaction user will be redirected to this URL. For example https://yourdomain.com/cart/iyzipay/odeme'),
+      '#default_value' => $this->configuration['odeme_url'],
+    );
+
 
     return $form;
   }
@@ -114,7 +121,7 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
     $this->configuration['baseurl'] = $form_state->getValue('baseurl');
     $this->configuration['completeurl'] = $form_state->getValue('complete_url');
     $this->configuration['notificationurl'] = $form_state->getValue('notification_url');
-
+    $this->configuration['odemeurl'] = $form_state->getValue('odeme_url');
 
 		//$_SESSION['Iyzipay']['sid']=$this->configuration['sid'];
 		//$_SESSION['Iyzipay']['secret_word']=$this->configuration['secret_word'];
@@ -229,8 +236,8 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
       //$form['#attached']['library'][] = 'uc_iyzipay/iyzipay.direct';
     }
 
-    $host = $this->configuration['demo'] ? 'sandbox' : 'www';
-    $form['#action'] = "http://charity.webstudio.web.tr/cart/iyzipay/odeme";
+    //$host = $this->configuration['demo'] ? 'sandbox' : 'www';
+    $form['#action'] = $this->configuration['odeme_url'];
 
 
     foreach ($data as $name => $value) {
