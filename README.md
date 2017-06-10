@@ -13,7 +13,7 @@ Kodun neredeyse tamamı 2CO ödeme yönteminden alınmış bulunmaktadır. Tüm 
 ### Kurulum:
 
 Drupal 8 Kurulumunuzun kök dizini / olmak üzere
-1. iyzipay kütüphanesini /libraries klasörü altına yapıştırın ve yeniden adlandırın sonuçta /libraries/iyzipay olsun.
+1. iyzipay php kütüphanesini /libraries klasörü altına yapıştırın ve yeniden adlandırın sonuçta /libraries/iyzipay olsun.
 1. uc_iyzipay modulünü /modules/ubercart/payment klasörünün altına yapıştırın.
 1. Drupal Kurulumunuzun /admin/modules sayfasını ziyaret edip;
 1. Ubercart için gerekli modülleri aktif hale getirin.
