@@ -61,22 +61,40 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
     $form['sid'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('API Key'),
-      '#description' => $this->t('Your iyzipay vendor account number.'),
+      '#description' => $this->t('Your iyzipay vendor account number given to you by Iyzico.'),
       '#default_value' => $this->configuration['sid'],
     );
     $form['secret_word'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Secret Key'),
-      '#description' => $this->t('The secret word entered in your iyzipay account Look and Feel settings.'),
+      '#description' => $this->t('The secretword given to you by Iyzico'),
       '#default_value' => $this->configuration['secret_word'],
+    );
+    $form['baseurl'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Base URL'),
+      '#description' => $this->t('Your Base URL given to you by Iyzico'),
+      '#default_value' => $this->configuration['baseurl'],
     );
     $form['notification_url'] = array(
       '#type' => 'url',
-      '#title' => $this->t('Base URL'),
-      '#description' => $this->t('Pass this URL to the <a href=":help_url">instant notification settings</a> parameter in your iyzipay account. This way, any refunds or failed fraud reviews will automatically cancel the Ubercart order.', [':help_url' => Url::fromUri('https://www.iyzipay.com/static/va/documentation/INS/index.html')->toString()]),
-      '#default_value' => Url::fromRoute('uc_iyzipay.notification', [], ['absolute' => TRUE])->toString(),
-      '#attributes' => array('readonly' => 'readonly'),
+      '#title' => $this->t('Notification URL'),
+      '#description' => $this->t('Notification URL for example https://yourdomain.com/cart/iyzipay/notification'),
+      '#default_value' => $this->configuration['notification_url'],
     );
+    $form['complete_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Tamamlandı URL'),
+      '#description' => $this->t('When the transaction Complete the cunsomer will be redirected to this URL. For example https://yourdomain.com/cart/iyzipay/complete'),
+      '#default_value' => $this->configuration['complete_url'],
+    );
+    $form['odeme_url'] = array(
+      '#type' => 'url',
+      '#title' => $this->t('Transaction URL'),
+      '#description' => $this->t('At the time of transaction user will be redirected to this URL. For example https://yourdomain.com/cart/iyzipay/odeme'),
+      '#default_value' => $this->configuration['odeme_url'],
+    );
+
 
     return $form;
   }
@@ -85,13 +103,32 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['check'] = $form_state->getValue('check');
-    $this->configuration['checkout_type'] = $form_state->getValue('checkout_type');
-    $this->configuration['demo'] = $form_state->getValue('demo');
-    $this->configuration['language'] = $form_state->getValue('language');
+    //$this->configuration['check'] = $form_state->getValue('check');
+    //$this->configuration['checkout_type'] = $form_state->getValue('checkout_type');
+    //$this->configuration['demo'] = $form_state->getValue('demo');
+    //$this->configuration['language'] = $form_state->getValue('language');
+    $config = \Drupal::service('config.factory')->getEditable('iyzipay.settings');
+    $config->set('apikey', $this->configuration['sid'])->save();
+		$config->set('secretkey', $this->configuration['secret_word'])->save();
+		$config->set('baseurl', $this->configuration['baseurl'])->save();
+		$config->set('completeurl', $this->configuration['complete_url'])->save();	
+		$config->set('notificationurl', $this->configuration['notification_url'])->save();	
+    //drupal_set_message($this->configuration['notification_url']);
+    
     $this->configuration['notification_url'] = $form_state->getValue('notification_url');
     $this->configuration['secret_word'] = $form_state->getValue('secret_word');
     $this->configuration['sid'] = $form_state->getValue('sid');
+    $this->configuration['baseurl'] = $form_state->getValue('baseurl');
+    $this->configuration['completeurl'] = $form_state->getValue('complete_url');
+    $this->configuration['notificationurl'] = $form_state->getValue('notification_url');
+    $this->configuration['odemeurl'] = $form_state->getValue('odeme_url');
+
+		//$_SESSION['Iyzipay']['sid']=$this->configuration['sid'];
+		//$_SESSION['Iyzipay']['secret_word']=$this->configuration['secret_word'];
+    // Set and save new message value.
+
+		//$config->set('baseurl', $form_state->getValue('notification_url'))->save();
+		//drupal_set_message(	"secretkey =".	$config->get('secretkey'));
   }
 
   /**
@@ -179,79 +216,10 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
       'currency_code' => $order->getCurrency(),
       'cart_order_id' => $order->id(),
     );
-/*
-    $i = 0;
-    foreach ($order->products as $product) {
-      $i++;
-      $data['li_' . $i . '_type'] = 'product';
-      $data['li_' . $i . '_name'] = $product->title->value; // @todo: HTML escape and limit to 128 chars
-      $data['li_' . $i . '_quantity'] = $product->qty->value;
-      $data['li_' . $i . '_product_id'] = $product->model->value;
-      $data['li_' . $i . '_price'] = uc_currency_format($product->price->value, FALSE, FALSE, '.');
-    }
-*/
-    $include_yolu = $_SERVER['DOCUMENT_ROOT'].'/modules/ubercart/payment/uc_iyzipay/iyzipay/samples/config.php';
-    require_once($include_yolu);
-    //kint($include_yolu);
-   // CheckBoxes.
-   $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
-   $request->setLocale(\Iyzipay\Model\Locale::TR);
-   $request->setConversationId($this->configuration['sid']);
-   //$request->setPrice("1");
-   //$request->setPaidPrice("1.3");
-   $request->setCurrency(\Iyzipay\Model\Currency::TL);
-   $request->setBasketId("B67832");
-   $request->setPaymentGroup(\Iyzipay\Model\PaymentGroup::PRODUCT);
-   $request->setCallbackUrl("http://charity.webstudio.web.tr/cart/iyzipay/complete");
-   $request->setEnabledInstallments(array(2, 3, 6, 9));
-
-   $buyer = new \Iyzipay\Model\Buyer();
-   $buyer->setId("BY789");
-   $buyer->setName("John");
-   $buyer->setSurname("Doe");
-   $buyer->setGsmNumber("+905350000000");
-   $buyer->setEmail("email@email.com");
-   $buyer->setIdentityNumber("74300864791");
-   $buyer->setLastLoginDate("2015-10-05 12:43:35");
-   $buyer->setRegistrationDate("2013-04-21 15:12:09");
-   $buyer->setRegistrationAddress("Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1");
-   $buyer->setIp("85.34.78.112");
-   $buyer->setCity("Istanbul");
-   $buyer->setCountry("Turkey");
-   $buyer->setZipCode("34732");
-
-   $request->setBuyer($buyer);
-   $shippingAddress = new \Iyzipay\Model\Address();
-   $shippingAddress->setContactName("Jane Doe");
-   $shippingAddress->setCity("Istanbul");
-   $shippingAddress->setCountry("Turkey");
-   $shippingAddress->setAddress("Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1");
-   $shippingAddress->setZipCode("34742");
-   $request->setShippingAddress($shippingAddress);
-
-   $billingAddress = new \Iyzipay\Model\Address();
-   $billingAddress->setContactName("Jane Doe");
-   $billingAddress->setCity("Istanbul");
-   $billingAddress->setCountry("Turkey");
-   $billingAddress->setAddress("Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1");
-   $billingAddress->setZipCode("34742");
-   $request->setBillingAddress($billingAddress);
-
-
-   $basketItems = array();
-
    $i = 0;
    $basketItem = array();
    $toplam_fiyat = 0;
    foreach ($order->products as $product) {
-
-     $basketItems[$i] = new \Iyzipay\Model\BasketItem();
-     $basketItems[$i]->setId($product->model->value);
-     $basketItems[$i]->setName($product->title->value);
-     $basketItems[$i]->setCategory1("product1");
-     $basketItems[$i]->setCategory2("product2");
-     $basketItems[$i]->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
-     $basketItems[$i]->setPrice( ($product->price->value) * ($product->qty->value) );
 
     //drupal_set_message($product->qty->value);
      $i++;
@@ -263,48 +231,13 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
 
      $toplam_fiyat= $toplam_fiyat + (uc_currency_format($product->price->value, FALSE, FALSE, '.')* ($product->qty->value) );
    }
-   $request->setPrice($toplam_fiyat);
-   $request->setPaidPrice($toplam_fiyat);
-   $request->setBasketItems($basketItems);
-
-/*
-   $firstBasketItem = new \Iyzipay\Model\BasketItem();
-   $firstBasketItem->setId("BI101");
-   $firstBasketItem->setName("Binocular");
-   $firstBasketItem->setCategory1("Collectibles");
-   $firstBasketItem->setCategory2("Accessories");
-   $firstBasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
-   $firstBasketItem->setPrice("0.3");
-   $basketItems[0] = $firstBasketItem;
-
-   $secondBasketItem = new \Iyzipay\Model\BasketItem();
-   $secondBasketItem->setId("BI102");
-   $secondBasketItem->setName("Game code");
-   $secondBasketItem->setCategory1("Game");
-   $secondBasketItem->setCategory2("Online Game Items");
-   $secondBasketItem->setItemType(\Iyzipay\Model\BasketItemType::VIRTUAL);
-   $secondBasketItem->setPrice("0.5");
-   $basketItems[1] = $secondBasketItem;
-
-   $thirdBasketItem = new \Iyzipay\Model\BasketItem();
-   $thirdBasketItem->setId("BI103");
-   $thirdBasketItem->setName("Usb");
-   $thirdBasketItem->setCategory1("Electronics");
-   $thirdBasketItem->setCategory2("Usb / Cable");
-   $thirdBasketItem->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
-   $thirdBasketItem->setPrice("0.2");
-   $basketItems[2] = $thirdBasketItem;
-   $request->setBasketItems($basketItems);
-*/
-   //$checkoutFormInitialize = \Iyzipay\Model\CheckoutFormInitialize::create($request, Config::options());
-   //print_r($checkoutFormInitialize->getCheckoutFormContent());
 
     if ('direct' == $this->configuration['checkout_type']) {
       //$form['#attached']['library'][] = 'uc_iyzipay/iyzipay.direct';
     }
 
-    $host = $this->configuration['demo'] ? 'sandbox' : 'www';
-    $form['#action'] = "http://charity.webstudio.web.tr/cart/iyzipay/odeme";
+    //$host = $this->configuration['demo'] ? 'sandbox' : 'www';
+    $form['#action'] = $this->configuration['odeme_url'];
 
 
     foreach ($data as $name => $value) {
@@ -321,17 +254,4 @@ class Iyzipay extends PaymentMethodPluginBase implements OffsitePaymentMethodPlu
   }
 
 }
-
-class Config
-{
-    public static function options()
-    {
-        $options = new \Iyzipay\Options();
-        $options->setApiKey("sandbox-mz89SNn9RuJIw8ZZdB8eeIZu3Vq4nW9S");
-        $options->setSecretKey("sandbox-9sYAYshumBYTnwlEqXJTt2ML5m6jKHDj");
-        $options->setBaseUrl("https://sandbox-api.iyzipay.com");
-        return $options;
-    }
-}
-
 ?>
