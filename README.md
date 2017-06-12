@@ -9,6 +9,9 @@ English installation coming soon.
 ## Türkçe
 Kodun neredeyse tamamı 2CO ödeme yönteminden alınmış bulunmaktadır. Tüm kod değişiklikleri GNU/GPL altında lisanslıdır. 
 
+### Önemli:
+1.Ubercart Ön tanımlı ülke seçmezseniz kredi kartı ekranında iyzico belirmeyecektir.
+1.İyzico için iyzipay-php eklentisini kurmalısınız. https://github.com/iyzico/iyzipay-php adresinden indirilen çalışıcaktır. Eğer Laravel v.s. diğer eklentileri libraries klasörünün altına kurarsanız çalışmama ihtimali var.
 
 ### Kurulum:
 
